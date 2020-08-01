@@ -8,9 +8,10 @@ class ElementWrapper {
       this.root.addEventListener(eventName, value);
     }
     if (name === 'className') {
-      this.root.setAttribute('class', name)
+      this.root.setAttribute('class', value)
+    } else {
+      this.root.setAttribute(name, value)
     }
-    this.root.setAttribute(name, value)
   }
   appendChild(vchild) {
     let range = document.createRange();
@@ -69,9 +70,13 @@ export class Component {
   setState(state) {
     let merge = (oldState, newState) => {
       for (let p in newState) {
-        if (typeof newState[p] === 'object') {
+        if (typeof newState[p] === 'object' && newState[p] !== null) {
           if (typeof oldState[p] !== 'object') {
-            oldState[p] = {}
+            if (newState[p] instanceof Array) {
+              oldState[p] = []
+            } else {
+              oldState[p] = {}
+            }
           }
           merge(oldState[p], newState[p])
         } else {
@@ -108,6 +113,9 @@ export const ToyReact = {
         if (typeof child === 'object' && child instanceof Array) {
           insertChildren(child)
         } else {
+          if (child === null || child === void 0) {
+            child = ''
+          }
           if (!(child instanceof Component) && !(child instanceof ElementWrapper) && !(child instanceof TextWrapper)) {
             child = String(child)
           }
